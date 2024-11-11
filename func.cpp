@@ -1,4 +1,5 @@
 ﻿#include <string>
+#include <regex>
 #include <algorithm>
 #include <filesystem>
 #include <string>
@@ -85,12 +86,18 @@ void deleteDirectoryContents(const std::filesystem::path& dir)
 	try
 	{
         for (const auto& entry : std::filesystem::directory_iterator(dir))
-            deleteFileOrFolder(entry.path().c_str());
-			/* std::filesystem::remove_all(entry.path());
+        {
+            std::string lastDoubleSlashes = std::regex_replace(entry.path().generic_string(), std::regex("\\\\"), "\\");    /*  replace "\\"  -> "\"     */
+            lastDoubleSlashes = std::regex_replace(lastDoubleSlashes, std::regex("/"), "\\");    /*  replace "/"  -> "\"     */
+            lastDoubleSlashes = std::regex_replace(lastDoubleSlashes, std::regex("//"), "\\\\");    /*  replace "//"  -> "\\"     */
+
+            CA2W slashesCleaned(lastDoubleSlashes.c_str());
+            deleteFileOrFolder(slashesCleaned);
+            /* std::filesystem::remove_all(entry.path());
             /* remove_all calls RemoveDirectoryW which says:
                 The path of the directory to be removed.
                 This path must specify an empty directory, and the calling process must have delete access to the directory. */
-
+        }
 	}
 	catch (std::exception& e)
 	{
