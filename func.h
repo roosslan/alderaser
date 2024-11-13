@@ -29,6 +29,11 @@ class alderaser
 {
 public:
 	alderaser();
+	~alderaser();
+	alderaser(const alderaser&);
+	alderaser& operator=(const alderaser&);
+	alderaser(alderaser&&) noexcept;
+	alderaser& operator=(alderaser&&) noexcept;
 	std::string iniFileName = "alderaser.ini";
 	std::string iniPath = std::filesystem::current_path().generic_string() + "/" + iniFileName;
 	CSimpleIniA configFile;						/* Platform X86/Win32 */

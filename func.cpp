@@ -30,6 +30,12 @@ alderaser::alderaser()
     configFile.SetUnicode();
 }
 
+alderaser::~alderaser() { }
+alderaser::alderaser(const alderaser&) { }
+alderaser& alderaser::operator=(const alderaser&) { }
+alderaser::alderaser(alderaser&&) { }
+alderaser& alderaser::operator=(alderaser&&) { }
+
 int alderaser::iniChecks()
 {
     SI_Error rc = configFile.LoadFile(iniPath.c_str());
