@@ -84,7 +84,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="alderaser.cpp" />
+    <ClCompile Include="aldev_cleaner.cpp" />
     <ClCompile Include="func.cpp" />
   </ItemGroup>
   <ItemGroup>

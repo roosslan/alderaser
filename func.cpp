@@ -24,14 +24,14 @@ namespace keywords = boost::log::keywords;
 
 #include "func.h"
 
-int iniChecks()
+alderaser::alderaser()
 {
     configFile.SetMultiKey(true);
-    std::string iniFileName = "alderaser.ini";
-
-    std::string iniPath = std::filesystem::current_path().generic_string() + "/" + iniFileName;
     configFile.SetUnicode();
+}
 
+int alderaser::iniChecks()
+{
     SI_Error rc = configFile.LoadFile(iniPath.c_str());
     if (rc < 0)
     {
@@ -49,12 +49,12 @@ int iniChecks()
     }
 }
 
-int bootstrap()
+int alderaser::bootstrap()
 {
     root_dir = configFile.GetValue("main", "root_directory", "");
     if (root_dir == "")
     {
-        LOG_SAVE << "root_directory parameter is empty in INI-file " << root_dir << std::endl;
+        LOG_SAVE << "0x6 root_directory parameter is empty in INI-file " << root_dir << std::endl;
         return 6;
     }
     LOG_SAVE << "root_directory parameter is " << root_dir << std::endl;
@@ -74,22 +74,22 @@ int bootstrap()
 
     if (!std::filesystem::exists(root_dir))
     {
-        LOG_SAVE << "The root directory not found. " << std::endl;
+        LOG_SAVE << "0x7 The root directory not found. " << std::endl;
         return 7;
     }
 
     return 0;
 }
 
-void deleteDirectoryContents(const std::filesystem::path& dir)
+void alderaser::deleteDirectoryContents(const std::filesystem::path& dir)
 {
 	try
 	{
         for (const auto& entry : std::filesystem::directory_iterator(dir))
         {
-            std::string lastDoubleSlashes = std::regex_replace(entry.path().generic_string(), std::regex("\\\\"), "\\");    /*  replace "\\"  -> "\"     */
-            lastDoubleSlashes = std::regex_replace(lastDoubleSlashes, std::regex("/"), "\\");    /*  replace "/"  -> "\"     */
-            lastDoubleSlashes = std::regex_replace(lastDoubleSlashes, std::regex("//"), "\\\\");    /*  replace "//"  -> "\\"     */
+            std::string lastDoubleSlashes = std::regex_replace(entry.path().generic_string(), std::regex("\\\\"), "\\");    /*  replace  "\\"   ->  "\"     */
+            lastDoubleSlashes = std::regex_replace(lastDoubleSlashes, std::regex("/"), "\\");                               /*  replace   "/"   ->  "\"     */
+            lastDoubleSlashes = std::regex_replace(lastDoubleSlashes, std::regex("//"), "\\\\");                            /*  replace  "//"   ->  "\\"     */
 
             CA2W slashesCleaned(lastDoubleSlashes.c_str());
             deleteFileOrFolder(slashesCleaned);
@@ -106,24 +106,24 @@ void deleteDirectoryContents(const std::filesystem::path& dir)
 	}
 }
 
-void CopyRecursive(const std::filesystem::path& src, const std::filesystem::path& target) noexcept
+void alderaser::CopyRecursive(const std::filesystem::path& src, const std::filesystem::path& target) noexcept
 {
-	try
-	{
-        std::filesystem::path mkALLdirs = target;        
-		LOG_SAVE << "Creating directories " << mkALLdirs.remove_filename() << std::endl;
+    try
+    {
+        std::filesystem::path mkALLdirs = target;
+        LOG_SAVE << "Creating directories " << mkALLdirs.remove_filename() << std::endl;
         std::filesystem::create_directories(mkALLdirs.remove_filename());
-		LOG_SAVE << "Copying data " << src.generic_string() << " to " << target.generic_string() << std::endl;
-		std::filesystem::copy(src, target, std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive);
-	}
-	catch (std::exception& e)
-	{
-		LOG_SAVE << "Catch e " << e.what() << std::endl;
-		std::cout << e.what();
-	}
+        LOG_SAVE << "Copying data " << src.generic_string() << " to " << target.generic_string() << std::endl;
+        std::filesystem::copy(src, target, std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive);
+    }
+    catch (std::exception& e)
+    {
+        LOG_SAVE << "Catch e " << e.what() << std::endl;
+        std::cout << e.what();
+    }
 }
 
-BOOL deleteFileOrFolder(LPCWSTR fileOrFolderPath) {
+BOOL alderaser::deleteFileOrFolder(LPCWSTR fileOrFolderPath) {
     HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
     if (FAILED(hr)) {
         //Couldn't initialize COM library - clean up and return
@@ -136,7 +136,7 @@ BOOL deleteFileOrFolder(LPCWSTR fileOrFolderPath) {
     hr = CoCreateInstance(CLSID_FileOperation, NULL, CLSCTX_ALL, IID_PPV_ARGS(&fileOperation));
     if (FAILED(hr)) {
         //Couldn't CoCreateInstance - clean up and return
-        LOG_SAVE <<  "Couldn't CoCreateInstance" << std::endl;
+        LOG_SAVE << "Couldn't CoCreateInstance" << std::endl;
         CoUninitialize();
         return FALSE;
     }
@@ -152,7 +152,7 @@ BOOL deleteFileOrFolder(LPCWSTR fileOrFolderPath) {
     hr = SHCreateItemFromParsingName(fileOrFolderPath, NULL, IID_PPV_ARGS(&fileOrFolderItem));
     if (FAILED(hr)) {
         //Couldn't get file into an item - clean up and return (maybe the file doesn't exist?)
-        LOG_SAVE <<  "Couldn't get file into an item" << std::endl;
+        LOG_SAVE << "Couldn't get file into an item" << std::endl;
         fileOrFolderItem->Release();
         fileOperation->Release();
         CoUninitialize();

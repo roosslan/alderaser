@@ -23,27 +23,32 @@ namespace logging = boost::log;
 #include "resource.h"
 #include "simpleini.h"
 
-extern CSimpleIniA configFile;						/* Platform X86/Win32 */
-extern std::string recycle_dir;
-extern std::string root_dir;
-extern std::vector<std::string> exclude_Folders;
+const std::string alVersion = "2.11.4.12";
 
-int iniChecks();
-int bootstrap();
+class alderaser
+{
+public:
+	alderaser();
+	std::string iniFileName = "alderaser.ini";
+	std::string iniPath = std::filesystem::current_path().generic_string() + "/" + iniFileName;
+	CSimpleIniA configFile;						/* Platform X86/Win32 */
+	std::string recycle_dir;
+	std::string root_dir;
+	std::vector<std::string> exclude_Folders;
 
-void deleteDirectoryContents(const std::filesystem::path& dir);
-void CopyRecursive(const std::filesystem::path& src, const std::filesystem::path& target) noexcept;
-BOOL deleteFileOrFolder(LPCWSTR fileOrFolderPath);
+	int iniChecks();
+	int bootstrap();
 
-const std::string alVersion = "2.11.3.76";
-
+	void deleteDirectoryContents(const std::filesystem::path& dir);
+	void CopyRecursive(const std::filesystem::path& src, const std::filesystem::path& target) noexcept;
+	BOOL deleteFileOrFolder(LPCWSTR fileOrFolderPath);
+};
 
 namespace rLogger
-{	
+{
 	void InitLogging();
 	void LogFormatter(logging::record_view const& rec, logging::formatting_ostream& strm);
 	std::string PathToFilename(std::string path);
 	std::string GetLogFolderPath();
 };
-
 #endif

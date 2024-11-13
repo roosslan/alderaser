@@ -31,26 +31,23 @@ static char THIS_FILE[] = __FILE__;
 #include "func.h"
 #include "simpleini.h"
 
-CSimpleIniA configFile;						/* Platform X86/Win32 */
-std::string recycle_dir;
-std::string root_dir;
-std::vector<std::string> exclude_Folders;
 
 //int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 int main(int argc, char* argv[])
 {
 	rLogger::InitLogging();
+	alderaser* o_Cleaner = new alderaser();
 
-	int hRes = iniChecks();
+	int hRes = o_Cleaner->iniChecks();
 
-	LOG_SAVE << "recycle_directory parameter is " << recycle_dir << std::endl;
+	LOG_SAVE << "recycle_directory parameter is " << o_Cleaner->recycle_dir << std::endl;
 
 	if (argc > 1)
 	{
 		if (strcmp(argv[1], "clrtrash") == 0)
 		{
-			LOG_SAVE << "Erasing recycle bin's (" << recycle_dir << ") content" << std::endl;
-			deleteDirectoryContents(recycle_dir);
+			LOG_SAVE << "Erasing recycle bin's (" << o_Cleaner->recycle_dir << ") content" << std::endl;
+			o_Cleaner->deleteDirectoryContents(o_Cleaner->recycle_dir);
 		}
 
 		if (argv[1] == "ShowWindow")
@@ -62,25 +59,26 @@ int main(int argc, char* argv[])
 		return 10; // 0xA
 	}
 
-	hRes = bootstrap();	/* Вторая часть ~марлезонского~ работы с INI */
+	hRes = o_Cleaner->bootstrap();	/* Вторая часть ~марлезонского~ работы с INI */
 
 	try
 	{
 		// directory_iterator can be iterated using a range-for loop
-		for (auto const& dir_entry : std::filesystem::directory_iterator{ root_dir })
+		for (auto const& dir_entry : std::filesystem::directory_iterator{ o_Cleaner->root_dir })
 		{
-			if ( std::filesystem::is_empty(dir_entry.path()) || dir_entry.path() == recycle_dir || std::find(exclude_Folders.begin(), exclude_Folders.end(), dir_entry.path()) != exclude_Folders.end() )
-			{
+			if ( std::filesystem::is_empty(dir_entry.path()) ||
+			     dir_entry.path() == o_Cleaner->recycle_dir  ||
+				 std::find(o_Cleaner->exclude_Folders.begin(), o_Cleaner->exclude_Folders.end(), dir_entry.path()) != o_Cleaner->exclude_Folders.end()	) {
 				// Папку не трогаем, ничего не делаем. Найдена в "Исключаемых", это Корзина, либо она не пуста
 			}
 			else
 			{
-				int rootDirLen = root_dir.length();
+				int rootDirLen = o_Cleaner->root_dir.length();
 				std::string path_wo_drvColon = dir_entry.path().generic_string();
 				path_wo_drvColon.erase(0, rootDirLen);
-				CopyRecursive(dir_entry.path(), recycle_dir + "\\" + path_wo_drvColon);
+				o_Cleaner->CopyRecursive(dir_entry.path(), o_Cleaner->recycle_dir + "\\" + path_wo_drvColon);
 				LOG_SAVE << "Removing " << dir_entry.path().generic_string() << " directory's content" << std::endl;
-				deleteDirectoryContents(dir_entry.path().generic_string());
+				o_Cleaner->deleteDirectoryContents(dir_entry.path().generic_string());
 			}
 		}
 
@@ -90,6 +88,8 @@ int main(int argc, char* argv[])
 		LOG_SAVE << "Catch e " << e.what() << std::endl;
 		std::cout << e.what();
 	}
+
+	LOG_SAVE << "Job is successfully finished! Exiting 0x0" << std::endl;
 	return 0;
 
 }

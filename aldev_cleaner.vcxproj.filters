@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="alderaser.cpp">
+    <ClCompile Include="aldev_cleaner.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="func.cpp">
